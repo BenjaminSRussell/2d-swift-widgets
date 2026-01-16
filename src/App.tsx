@@ -24,18 +24,30 @@ function App() {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 perspective-1000 relative z-20">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 perspective-1000 relative z-20 items-center justify-items-center">
 
         <ElasticWrapper>
-          <WeatherWidget />
+          <WeatherWidget size="small" />
         </ElasticWrapper>
 
         <ElasticWrapper>
-          <MusicPlayerWidget />
+          <WeatherWidget size="medium" />
         </ElasticWrapper>
 
         <ElasticWrapper>
-          <StocksWidget />
+          <MusicPlayerWidget size="small" />
+        </ElasticWrapper>
+
+        <ElasticWrapper>
+          <MusicPlayerWidget size="medium" />
+        </ElasticWrapper>
+
+        <ElasticWrapper>
+          <StocksWidget size="small" />
+        </ElasticWrapper>
+
+        <ElasticWrapper>
+          <StocksWidget size="medium" />
         </ElasticWrapper>
 
       </div>

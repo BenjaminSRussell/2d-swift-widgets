@@ -1,14 +1,31 @@
 import { GlassPane } from '../core/GlassPane';
-import { Sun, Wind, Droplets } from 'lucide-react';
+import { Sun, Wind, Droplets, ArrowUp, Calendar, CloudRain, CloudSun } from 'lucide-react';
 import { motion } from 'framer-motion';
+import type { WidgetSize } from '../../types/widget';
+import clsx from 'clsx';
 
-export const WeatherWidget = () => {
+interface WeatherWidgetProps {
+    size?: WidgetSize;
+}
+
+export const WeatherWidget = ({ size = 'small' }: WeatherWidgetProps) => {
     // Mock Data
     const currentTemp = 72;
     const condition = "Partly Cloudy";
+    const high = 78;
+    const low = 62;
+
+    const sizeClasses = {
+        small: "w-[155px] h-[155px]",
+        medium: "w-[329px] h-[155px]",
+        large: "w-[329px] h-[345px]",
+    };
 
     return (
-        <GlassPane className="h-64 w-64 flex flex-col justify-between p-6 relative overflow-hidden group">
+        <GlassPane className={clsx(
+            "relative overflow-hidden group p-4 flex flex-col justify-between transition-all duration-300",
+            sizeClasses[size]
+        )}>
             {/* Background Gradient - Animated */}
             <motion.div
                 className="absolute inset-0 bg-gradient-to-br from-blue-400/20 via-purple-400/10 to-orange-400/20 opacity-50 z-0"
@@ -23,34 +40,79 @@ export const WeatherWidget = () => {
                 }}
             />
 
-            {/* Header */}
-            <div className="relative z-10 flex justify-between items-start">
-                <div className="flex flex-col">
-                    <span className="text-sm font-medium opacity-60 uppercase tracking-wider">San Francisco</span>
-                    <span className="text-xs opacity-40">California</span>
-                </div>
-                <Sun className="text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]" size={24} />
-            </div>
+            {/* Small Layout */}
+            {size === 'small' && (
+                <>
+                    <div className="relative z-10 flex justify-between items-start">
+                        <div className="flex flex-col">
+                            <span className="text-xs font-semibold opacity-70 uppercase tracking-wider">San Fran</span>
+                        </div>
+                        <Sun className="text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]" size={20} />
+                    </div>
 
-            {/* Main Temp */}
-            <div className="relative z-10 flex flex-col items-center justify-center -mt-2">
-                <span className="text-6xl font-thin tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-white to-white/70">
-                    {currentTemp}°
-                </span>
-                <span className="text-sm font-medium opacity-70 mt-1">{condition}</span>
-            </div>
+                    <div className="relative z-10 flex flex-col items-center justify-center -mt-1">
+                        <span className="text-5xl font-thin tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-white to-white/70">
+                            {currentTemp}°
+                        </span>
+                        <span className="text-xs font-medium opacity-70">{condition}</span>
+                    </div>
 
-            {/* Footer Stats */}
-            <div className="relative z-10 grid grid-cols-2 gap-2 mt-2">
-                <div className="flex items-center gap-2 bg-white/5 p-2 rounded-xl backdrop-blur-sm border border-white/5">
-                    <Wind size={14} className="opacity-50" />
-                    <span className="text-xs font-semibold">8 mph</span>
+                    <div className="relative z-10 flex justify-between items-center mt-1 px-1">
+                        <div className="flex items-center gap-1">
+                            <span className="text-[10px] font-medium opacity-50">H:{high}°</span>
+                            <span className="text-[10px] font-medium opacity-50">L:{low}°</span>
+                        </div>
+                    </div>
+                </>
+            )}
+
+            {/* Medium Layout */}
+            {size === 'medium' && (
+                <div className="relative z-10 flex w-full h-full gap-6">
+                    {/* Left Side: Main Info */}
+                    <div className="flex flex-col justify-between w-1/3">
+                        <div className="flex flex-col">
+                            <span className="text-xs font-bold opacity-70 uppercase tracking-wider">San Francisco</span>
+                            <span className="text-[10px] opacity-50">California</span>
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-5xl font-light tracking-tighter text-white">
+                                {currentTemp}°
+                            </span>
+                            <span className="text-xs font-medium opacity-60 text-white/80">{condition}</span>
+                        </div>
+                    </div>
+
+                    {/* Right Side: Detailed Stats & Forecast */}
+                    <div className="flex-1 flex flex-col justify-between">
+                        <div className="flex items-center justify-end gap-2 text-white/60">
+                            <Calendar size={14} />
+                            <span className="text-[10px] font-medium uppercase">Using loc: Home</span>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2">
+                            {/* Stat 1 */}
+                            <div className="bg-white/5 rounded-lg p-2 flex flex-col items-center justify-center border border-white/5 backdrop-blur-md">
+                                <Wind size={16} className="text-white/60 mb-1" />
+                                <span className="text-xs font-bold text-white/90">8 mph</span>
+                                <span className="text-[9px] text-white/40 uppercase">Wind</span>
+                            </div>
+                            {/* Stat 2 */}
+                            <div className="bg-white/5 rounded-lg p-2 flex flex-col items-center justify-center border border-white/5 backdrop-blur-md">
+                                <Droplets size={16} className="text-blue-300/60 mb-1" />
+                                <span className="text-xs font-bold text-white/90">42%</span>
+                                <span className="text-[9px] text-white/40 uppercase">Humid</span>
+                            </div>
+                            {/* Stat 3 */}
+                            <div className="bg-white/5 rounded-lg p-2 flex flex-col items-center justify-center border border-white/5 backdrop-blur-md">
+                                <ArrowUp size={16} className="text-orange-300/60 mb-1" />
+                                <span className="text-xs font-bold text-white/90">{high}°</span>
+                                <span className="text-[9px] text-white/40 uppercase">High</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div className="flex items-center gap-2 bg-white/5 p-2 rounded-xl backdrop-blur-sm border border-white/5">
-                    <Droplets size={14} className="opacity-50" />
-                    <span className="text-xs font-semibold">42%</span>
-                </div>
-            </div>
+            )}
 
             {/* Decoration Circles (Abstract) */}
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-yellow-300/10 rounded-full blur-2xl z-0 pointer-events-none" />

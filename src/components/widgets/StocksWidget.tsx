@@ -1,9 +1,22 @@
 import { useRef, useEffect } from 'react';
 import { GlassPane } from '../core/GlassPane';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, TrendingUp, DollarSign } from 'lucide-react';
+import type { WidgetSize } from '../../types/widget';
+import clsx from 'clsx';
 
-export const StocksWidget = () => {
+interface StocksWidgetProps {
+    size?: WidgetSize;
+}
+
+export const StocksWidget = ({ size = 'small' }: StocksWidgetProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    // Dynamic dimensions based on size (could be more robust with ResizeObserver, but fixed checks work for this strict system)
+    const isMedium = size === 'medium';
+    // Small: 155 wide, Medium: 329 wide.
+    // We'll set canvas width internally.
+    const canvasWidth = isMedium ? 450 : 256; // logical width for data density
+    const canvasHeight = 140;
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -13,18 +26,21 @@ export const StocksWidget = () => {
 
         // High DPI fix
         const dpr = window.devicePixelRatio || 1;
-        // We assume 256x256 minus padding
-        const width = 256;
-        const height = 140; // Height of chart area
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
-        canvas.style.width = `${width}px`;
-        canvas.style.height = `${height}px`;
+
+        // CSS Display dimensions
+        // Small is ~256px logical internal coordinate space scaled down? 
+        // Actually, let's keep the coordinate space matching the CSS pixel ratio or fixed logic
+        // We will just draw to the canvas size.
+
+        canvas.width = canvasWidth * dpr;
+        canvas.height = canvasHeight * dpr;
+        canvas.style.width = `100%`; // let CSS handle the width
+        canvas.style.height = `${canvasHeight}px`;
         ctx.scale(dpr, dpr);
 
         let animationFrameId: number;
         const points: number[] = [];
-        const numPoints = 30; // Number of data points
+        const numPoints = isMedium ? 50 : 30; // More points for wider chart
 
         // Init random points
         let lastPoint = 50;
@@ -43,44 +59,44 @@ export const StocksWidget = () => {
                 points.push(newPoint);
             }
 
-            ctx.clearRect(0, 0, width, height);
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
             // Gradient for fill
-            const gradient = ctx.createLinearGradient(0, 0, 0, height);
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvasHeight);
             gradient.addColorStop(0, 'rgba(34, 197, 94, 0.4)'); // Green top
             gradient.addColorStop(1, 'rgba(34, 197, 94, 0.0)');
 
             // Draw Path
             ctx.beginPath();
-            const stepX = width / (numPoints - 1);
+            const stepX = canvasWidth / (numPoints - 1);
 
             // Move to first point
-            ctx.moveTo(0, height - points[0]);
+            ctx.moveTo(0, canvasHeight - points[0]);
 
             // CurveTo for smooth lines
             for (let i = 0; i < points.length - 1; i++) {
                 const xMid = (i * stepX + (i + 1) * stepX) / 2;
-                const yMid = ((height - points[i]) + (height - points[i + 1])) / 2;
-                ctx.quadraticCurveTo(i * stepX, height - points[i], xMid, yMid);
+                const yMid = ((canvasHeight - points[i]) + (canvasHeight - points[i + 1])) / 2;
+                ctx.quadraticCurveTo(i * stepX, canvasHeight - points[i], xMid, yMid);
             }
             // Connect last point
-            ctx.lineTo(width, height - points[points.length - 1]);
+            ctx.lineTo(canvasWidth, canvasHeight - points[points.length - 1]);
 
             // Close path for fill
-            ctx.lineTo(width, height);
-            ctx.lineTo(0, height);
+            ctx.lineTo(canvasWidth, canvasHeight);
+            ctx.lineTo(0, canvasHeight);
             ctx.fillStyle = gradient;
             ctx.fill();
 
             // Stroke on top
             ctx.beginPath();
-            ctx.moveTo(0, height - points[0]);
+            ctx.moveTo(0, canvasHeight - points[0]);
             for (let i = 0; i < points.length - 1; i++) {
                 const xMid = (i * stepX + (i + 1) * stepX) / 2;
-                const yMid = ((height - points[i]) + (height - points[i + 1])) / 2;
-                ctx.quadraticCurveTo(i * stepX, height - points[i], xMid, yMid);
+                const yMid = ((canvasHeight - points[i]) + (canvasHeight - points[i + 1])) / 2;
+                ctx.quadraticCurveTo(i * stepX, canvasHeight - points[i], xMid, yMid);
             }
-            ctx.lineTo(width, height - points[points.length - 1]);
+            ctx.lineTo(canvasWidth, canvasHeight - points[points.length - 1]);
             ctx.lineWidth = 3;
             ctx.strokeStyle = '#22c55e'; // Green 500
             ctx.lineCap = "round";
@@ -93,20 +109,31 @@ export const StocksWidget = () => {
         render();
 
         return () => cancelAnimationFrame(animationFrameId);
-    }, []);
+    }, [isMedium, canvasWidth]);
+
+    const sizeClasses = {
+        small: "w-[155px] h-[155px]",
+        medium: "w-[329px] h-[155px]",
+        large: "w-[329px] h-[345px]",
+    };
 
     return (
-        <GlassPane className="h-64 w-64 flex flex-col justify-between py-6 px-0 relative overflow-hidden">
+        <GlassPane className={clsx(
+            "relative overflow-hidden group py-4 flex flex-col justify-between transition-all duration-300",
+            sizeClasses[size]
+        )}>
             {/* Header */}
-            <div className="px-6 flex justify-between items-start">
-                <div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
-                            <span className="text-white font-bold text-xs">A</span>
-                        </div>
-                        <span className="font-bold text-lg">AAPL</span>
+            <div className="px-5 flex justify-between items-start z-10">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center shadow-lg">
+                        <span className="text-white font-bold text-xs">A</span>
                     </div>
-                    <span className="text-xs opacity-50 font-medium ml-1">Apple Inc.</span>
+                    <div>
+                        <div className="flex items-baseline gap-1">
+                            <span className="font-bold text-lg leading-none">AAPL</span>
+                        </div>
+                        <span className="text-[10px] opacity-50 font-medium uppercase tracking-wider">Apple Inc.</span>
+                    </div>
                 </div>
 
                 <div className="flex flex-col items-end">
@@ -117,10 +144,27 @@ export const StocksWidget = () => {
                 </div>
             </div>
 
+            {/* Medium Layout Extras */}
+            {size === 'medium' && (
+                <div className="px-5 mt-1 flex gap-4 opacity-70">
+                    <div className="flex items-center gap-1.5">
+                        <TrendingUp size={12} className="text-green-500" />
+                        <span className="text-xs font-semibold">Bullish</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                        <DollarSign size={12} className="text-white/60" />
+                        <span className="text-xs font-medium text-white/60">Vol: 45.2M</span>
+                    </div>
+                </div>
+            )}
+
             {/* Chart Area */}
-            <div className="flex-1 w-full relative mt-4">
-                <canvas ref={canvasRef} className="absolute bottom-0 left-0 w-full h-[140px]" />
+            <div className="absolute bottom-0 left-0 right-0 h-[100px] z-0">
+                <canvas ref={canvasRef} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
             </div>
+
+            {/* Overlay Gradient for seamless chart fade */}
+            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[var(--glass-surface)] to-transparent pointer-events-none opacity-20" />
         </GlassPane>
     );
 };
