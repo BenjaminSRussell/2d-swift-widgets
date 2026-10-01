@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GlassPane } from '../core/GlassPane';
 import { Play, SkipForward, SkipBack, Heart, ListMusic, Volume2 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -11,6 +11,23 @@ interface MusicPlayerWidgetProps {
 
 export const MusicPlayerWidget = ({ size = 'small' }: MusicPlayerWidgetProps) => {
     const [isPlaying, setIsPlaying] = useState(true);
+    const [currentTime, setCurrentTime] = useState(36); // 36 seconds elapsed
+    const duration = 120; // 2 minutes total
+    const progressPercentage = (currentTime / duration) * 100;
+
+    // Simulate playback progression
+    useEffect(() => {
+        if (!isPlaying) return;
+
+        const interval = setInterval(() => {
+            setCurrentTime(prev => {
+                const next = prev + 1;
+                return next >= duration ? duration : next;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [isPlaying, duration]);
 
     const sizeClasses = {
         small: "w-[155px] h-[155px]",
@@ -85,12 +102,20 @@ export const MusicPlayerWidget = ({ size = 'small' }: MusicPlayerWidgetProps) =>
                         </div>
 
                         {/* Scrubber */}
-                        <div className="w-full h-1 bg-white/10 rounded-full my-3 overflow-hidden">
+                        <div
+                            className="w-full h-1 bg-white/10 rounded-full my-3 overflow-hidden cursor-pointer"
+                            onClick={(e) => {
+                                const rect = e.currentTarget.getBoundingClientRect();
+                                const clickX = e.clientX - rect.left;
+                                const newProgress = clickX / rect.width;
+                                const newTime = Math.max(0, Math.min(newProgress * duration, duration));
+                                setCurrentTime(newTime);
+                            }}
+                        >
                             <motion.div
                                 className="h-full bg-white/90 rounded-full"
-                                initial={{ width: "30%" }}
-                                animate={{ width: isPlaying ? "100%" : "30%" }}
-                                transition={{ duration: 120, ease: "linear" }}
+                                animate={{ width: `${progressPercentage}%` }}
+                                transition={{ duration: isPlaying ? 0.1 : 0, ease: "linear" }}
                             />
                         </div>
 
