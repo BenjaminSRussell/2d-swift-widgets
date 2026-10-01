@@ -28,7 +28,7 @@ export const StocksWidget = ({ size = 'small' }: StocksWidgetProps) => {
         const dpr = window.devicePixelRatio || 1;
 
         // CSS Display dimensions
-        // Small is ~256px logical internal coordinate space scaled down? 
+        // Small is ~256px logical internal coordinate space scaled down?
         // Actually, let's keep the coordinate space matching the CSS pixel ratio or fixed logic
         // We will just draw to the canvas size.
 
@@ -49,6 +49,14 @@ export const StocksWidget = ({ size = 'small' }: StocksWidgetProps) => {
             lastPoint = Math.max(10, Math.min(90, lastPoint + change));
             points.push(lastPoint);
         }
+
+        // Helper to calculate Y position with vertical padding
+        const innerMargin = 8;
+        const minPoint = 10;
+        const maxPoint = 100;
+        const calculateY = (point: number) => {
+            return innerMargin + ((canvasHeight - 2 * innerMargin) * (1 - (point - minPoint) / (maxPoint - minPoint)));
+        };
 
         const render = () => {
             // Shift data
@@ -71,16 +79,16 @@ export const StocksWidget = ({ size = 'small' }: StocksWidgetProps) => {
             const stepX = canvasWidth / (numPoints - 1);
 
             // Move to first point
-            ctx.moveTo(0, canvasHeight - points[0]);
+            ctx.moveTo(0, calculateY(points[0]));
 
             // CurveTo for smooth lines
             for (let i = 0; i < points.length - 1; i++) {
                 const xMid = (i * stepX + (i + 1) * stepX) / 2;
-                const yMid = ((canvasHeight - points[i]) + (canvasHeight - points[i + 1])) / 2;
-                ctx.quadraticCurveTo(i * stepX, canvasHeight - points[i], xMid, yMid);
+                const yMid = (calculateY(points[i]) + calculateY(points[i + 1])) / 2;
+                ctx.quadraticCurveTo(i * stepX, calculateY(points[i]), xMid, yMid);
             }
             // Connect last point
-            ctx.lineTo(canvasWidth, canvasHeight - points[points.length - 1]);
+            ctx.lineTo(canvasWidth, calculateY(points[points.length - 1]));
 
             // Close path for fill
             ctx.lineTo(canvasWidth, canvasHeight);
@@ -90,13 +98,13 @@ export const StocksWidget = ({ size = 'small' }: StocksWidgetProps) => {
 
             // Stroke on top
             ctx.beginPath();
-            ctx.moveTo(0, canvasHeight - points[0]);
+            ctx.moveTo(0, calculateY(points[0]));
             for (let i = 0; i < points.length - 1; i++) {
                 const xMid = (i * stepX + (i + 1) * stepX) / 2;
-                const yMid = ((canvasHeight - points[i]) + (canvasHeight - points[i + 1])) / 2;
-                ctx.quadraticCurveTo(i * stepX, canvasHeight - points[i], xMid, yMid);
+                const yMid = (calculateY(points[i]) + calculateY(points[i + 1])) / 2;
+                ctx.quadraticCurveTo(i * stepX, calculateY(points[i]), xMid, yMid);
             }
-            ctx.lineTo(canvasWidth, canvasHeight - points[points.length - 1]);
+            ctx.lineTo(canvasWidth, calculateY(points[points.length - 1]));
             ctx.lineWidth = 3;
             ctx.strokeStyle = '#22c55e'; // Green 500
             ctx.lineCap = "round";
