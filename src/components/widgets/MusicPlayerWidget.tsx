@@ -115,6 +115,82 @@ export const MusicPlayerWidget = ({ size = 'small' }: MusicPlayerWidgetProps) =>
                     </div>
                 </div>
             )}
+
+            {/* LARGE LAYOUT */}
+            {size === 'large' && (
+                <div className="flex flex-col w-full h-full relative z-10 p-6 gap-6">
+                    {/* Album Art and Waveform */}
+                    <div className="flex-1 flex flex-col items-center justify-center gap-6">
+                        <motion.div
+                            className="w-32 h-32 rounded-2xl shadow-2xl bg-gradient-to-tr from-pink-500 via-red-500 to-yellow-500 overflow-hidden relative"
+                            animate={{ scale: isPlaying ? [1, 1.02, 1] : 1 }}
+                            transition={{ duration: 0.8, repeat: Infinity }}
+                        >
+                            <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-bl from-white/20 to-transparent pointer-events-none" />
+                        </motion.div>
+
+                        {/* Waveform Scrubber */}
+                        <div className="w-full px-6">
+                            <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                                <motion.div
+                                    className="h-full bg-white/90 rounded-full"
+                                    initial={{ width: "30%" }}
+                                    animate={{ width: isPlaying ? "100%" : "30%" }}
+                                    transition={{ duration: 120, ease: "linear" }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Song Info */}
+                    <div className="flex flex-col gap-4 px-6">
+                        <div className="flex justify-between items-start">
+                            <div className="flex flex-col flex-1">
+                                <span className="text-xl font-bold leading-tight">Midnight City</span>
+                                <span className="text-sm opacity-60 font-medium">M83 • Hurry Up, We're Dreaming</span>
+                            </div>
+                            <Heart size={20} className="text-pink-500 fill-pink-500" />
+                        </div>
+
+                        {/* Controls */}
+                        <div className="flex justify-center items-center gap-6">
+                            <SkipBack size={24} fill="currentColor" className="opacity-70 hover:opacity-100 cursor-pointer" />
+                            <motion.div
+                                className="w-14 h-14 bg-white text-black rounded-full flex items-center justify-center shadow-lg cursor-pointer"
+                                whileTap={{ scale: 0.9 }}
+                                onClick={() => setIsPlaying(!isPlaying)}
+                            >
+                                {isPlaying ? <div className="w-4 h-4 bg-black flex gap-1"><div className="w-1 h-full bg-black" /> <div className="w-1 h-full bg-black" /></div> : <Play size={22} fill="currentColor" className="ml-1" />}
+                            </motion.div>
+                            <SkipForward size={24} fill="currentColor" className="opacity-70 hover:opacity-100 cursor-pointer" />
+                        </div>
+
+                        {/* Bottom Controls */}
+                        <div className="flex justify-between items-center opacity-60">
+                            <ListMusic size={18} className="hover:opacity-100 cursor-pointer" />
+                            <Volume2 size={18} className="hover:opacity-100 cursor-pointer" />
+                        </div>
+                    </div>
+
+                    {/* Tracklist (Simple representation) */}
+                    <div className="flex-1 overflow-y-auto px-6 border-t border-white/10 pt-4">
+                        <div className="space-y-2 text-sm">
+                            <div className="flex justify-between opacity-80 hover:opacity-100 cursor-pointer">
+                                <span>1. Intro</span>
+                                <span className="opacity-50">0:45</span>
+                            </div>
+                            <div className="flex justify-between opacity-60 hover:opacity-80 cursor-pointer">
+                                <span>2. Midnight City</span>
+                                <span className="opacity-50">4:37</span>
+                            </div>
+                            <div className="flex justify-between opacity-60 hover:opacity-80 cursor-pointer">
+                                <span>3. Outro</span>
+                                <span className="opacity-50">3:12</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </GlassPane>
     );
 };
