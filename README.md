@@ -73,3 +73,9 @@ export default defineConfig([
   },
 ])
 ```
+
+## Accessibility
+
+- Skip link jumps to `#widget-grid`.
+- Each `ElasticWrapper` is keyboard-focusable with a visible focus ring.
+- `prefers-reduced-motion: reduce` disables drag bounce / spring deformation (static shell).
