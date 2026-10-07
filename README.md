@@ -79,3 +79,8 @@ export default defineConfig([
 - Skip link jumps to `#widget-grid`.
 - Each `ElasticWrapper` is keyboard-focusable with a visible focus ring.
 - `prefers-reduced-motion: reduce` disables drag bounce / spring deformation (static shell).
+
+
+## Layout persistence (#6)
+
+Widget visibility and order persist in `localStorage` (`glass-engine.layout.v1`). Use Export/Import JSON in the Layout controls. Run `npm run test:layout` for serialize round-trip.

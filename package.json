@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:layout": "npx --yes tsx src/layout/store.test.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
