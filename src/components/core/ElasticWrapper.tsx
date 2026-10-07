@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     motion,
     useMotionValue,
@@ -10,35 +10,62 @@ import {
 
 interface ElasticWrapperProps extends HTMLMotionProps<"div"> {
     children: React.ReactNode;
+    /** Accessible name for the interactive widget shell */
+    ariaLabel?: string;
 }
 
-export const ElasticWrapper: React.FC<ElasticWrapperProps> = ({ children, style, ...props }) => {
+function usePrefersReducedMotion(): boolean {
+    const [reduced, setReduced] = useState(false);
+    useEffect(() => {
+        const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const update = () => setReduced(mq.matches);
+        update();
+        mq.addEventListener?.('change', update);
+        return () => mq.removeEventListener?.('change', update);
+    }, []);
+    return reduced;
+}
+
+export const ElasticWrapper: React.FC<ElasticWrapperProps> = ({
+    children,
+    style,
+    ariaLabel = 'Draggable widget',
+    ...props
+}) => {
+    const reduceMotion = usePrefersReducedMotion();
     const x = useMotionValue(0);
     const y = useMotionValue(0);
 
-    // Track velocity of drag
     const xVelocity = useVelocity(x);
     const yVelocity = useVelocity(y);
-
-    // Smooth out the velocity reading to prevent jitter
     const smoothXVelocity = useSpring(xVelocity, { damping: 20, stiffness: 200 });
     const smoothYVelocity = useSpring(yVelocity, { damping: 20, stiffness: 200 });
 
-    // Transform velocity into scale (stretch effect)
-    // When moving fast in X, stretch X and squash Y
     const scaleX = useTransform(smoothXVelocity, [-1000, 0, 1000], [1.05, 1, 1.05]);
     const scaleY = useTransform(smoothYVelocity, [-1000, 0, 1000], [1.05, 1, 1.05]);
-
-    // Simplified "Bubble" Physics:
-    // Speed -> Slight Scale Up overall + Tilt
-    const tiltX = useTransform(y, [-100, 100], [10, -10]); // Tilt based on position (parallax)
+    const tiltX = useTransform(y, [-100, 100], [10, -10]);
     const tiltY = useTransform(x, [-100, 100], [-10, 10]);
-
-    // Bubble Radius: Deform the corners during high velocity
     const borderRadius = useTransform(smoothXVelocity, [-1000, 0, 1000], ["40px", "24px", "40px"]);
+
+    if (reduceMotion) {
+        return (
+            <div
+                role="group"
+                aria-label={ariaLabel}
+                tabIndex={0}
+                className="overflow-hidden rounded-3xl outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                style={{ cursor: 'default', zIndex: 10, ...style }}
+            >
+                {children}
+            </div>
+        );
+    }
 
     return (
         <motion.div
+            role="group"
+            aria-label={ariaLabel}
+            tabIndex={0}
             drag
             dragConstraints={{ left: -400, right: 400, top: -400, bottom: 400 }}
             dragElastic={0.2}
@@ -47,8 +74,8 @@ export const ElasticWrapper: React.FC<ElasticWrapperProps> = ({ children, style,
             style={{
                 x,
                 y,
-                scaleX: scaleX,
-                scaleY: scaleY,
+                scaleX,
+                scaleY,
                 rotateX: tiltX,
                 rotateY: tiltY,
                 borderRadius,
@@ -57,7 +84,7 @@ export const ElasticWrapper: React.FC<ElasticWrapperProps> = ({ children, style,
                 zIndex: 10,
                 ...style
             }}
-            className="overflow-hidden"
+            className="overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
             {...props}
         >
