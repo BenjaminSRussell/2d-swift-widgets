@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test:layout": "npx --yes tsx src/layout/store.test.ts"
+    "test:layout": "npx --yes tsx src/layout/store.test.ts",
+    "test:stale": "npx --yes tsx src/feeds/stale.test.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import type { WidgetSize } from '../../types/widget';
 import clsx from 'clsx';
 import { useWidgetFeed } from '../../hooks/useWidgetFeed';
+import { StaleBadge } from '../core/StaleBadge';
 import type { WeatherPayload } from '../../types/widgetData';
 
 interface WeatherWidgetProps {
@@ -11,7 +12,7 @@ interface WeatherWidgetProps {
 }
 
 export const WeatherWidget = ({ size = 'small' }: WeatherWidgetProps) => {
-    const { data } = useWidgetFeed<WeatherPayload>('weather');
+    const { data, stale } = useWidgetFeed<WeatherPayload>('weather');
     const currentTemp = data?.temp_f ?? 72;
     const condition = data?.condition ?? 'Partly Cloudy';
     const high = data?.high_f ?? 78;
@@ -29,6 +30,7 @@ export const WeatherWidget = ({ size = 'small' }: WeatherWidgetProps) => {
             "relative overflow-hidden group p-4 flex flex-col justify-between transition-all duration-300",
             sizeClasses[size]
         )}>
+            <StaleBadge show={stale} />
             {/* Background Gradient - Animated */}
             <motion.div
                 className="absolute inset-0 bg-gradient-to-br from-blue-400/20 via-purple-400/10 to-orange-400/20 opacity-50 z-0"

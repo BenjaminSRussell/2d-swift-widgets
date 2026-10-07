@@ -89,3 +89,8 @@ Widget visibility and order persist in `localStorage` (`glass-engine.layout.v1`)
 ## Widget feed contract (#5)
 
 See [docs/schema/widget-feeds.md](docs/schema/widget-feeds.md) and outline Blueprint. Widgets load `/api/widget/{kind}` with fixture fallback under `public/fixtures/`.
+
+
+## Feed reload + stale badge (#8)
+
+Per-feed reload intervals and stale-after thresholds live in `src/feeds/stale.ts`. Widgets show a **Stale** badge when the last successful refresh exceeds the threshold (`prefers-reduced-motion` disables pulse). `npm run test:stale`.
