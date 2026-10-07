@@ -3,17 +3,20 @@ import { Sun, Wind, Droplets, ArrowUp, Calendar, CloudRain, CloudSun } from 'luc
 import { motion } from 'framer-motion';
 import type { WidgetSize } from '../../types/widget';
 import clsx from 'clsx';
+import { useWidgetFeed } from '../../hooks/useWidgetFeed';
+import type { WeatherPayload } from '../../types/widgetData';
 
 interface WeatherWidgetProps {
     size?: WidgetSize;
 }
 
 export const WeatherWidget = ({ size = 'small' }: WeatherWidgetProps) => {
-    // Mock Data
-    const currentTemp = 72;
-    const condition = "Partly Cloudy";
-    const high = 78;
-    const low = 62;
+    const { data } = useWidgetFeed<WeatherPayload>('weather');
+    const currentTemp = data?.temp_f ?? 72;
+    const condition = data?.condition ?? 'Partly Cloudy';
+    const high = data?.high_f ?? 78;
+    const low = data?.low_f ?? 62;
+    const location = data?.location ?? 'San Fran';
 
     const sizeClasses = {
         small: "w-[155px] h-[155px]",
@@ -45,7 +48,7 @@ export const WeatherWidget = ({ size = 'small' }: WeatherWidgetProps) => {
                 <>
                     <div className="relative z-10 flex justify-between items-start">
                         <div className="flex flex-col">
-                            <span className="text-xs font-semibold opacity-70 uppercase tracking-wider">San Fran</span>
+                            <span className="text-xs font-semibold opacity-70 uppercase tracking-wider">{location}</span>
                         </div>
                         <Sun className="text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]" size={20} />
                     </div>

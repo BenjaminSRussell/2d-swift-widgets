@@ -84,3 +84,8 @@ export default defineConfig([
 ## Layout persistence (#6)
 
 Widget visibility and order persist in `localStorage` (`glass-engine.layout.v1`). Use Export/Import JSON in the Layout controls. Run `npm run test:layout` for serialize round-trip.
+
+
+## Widget feed contract (#5)
+
+See [docs/schema/widget-feeds.md](docs/schema/widget-feeds.md) and outline Blueprint. Widgets load `/api/widget/{kind}` with fixture fallback under `public/fixtures/`.

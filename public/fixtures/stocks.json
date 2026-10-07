@@ -1,0 +1,10 @@
+{
+  "kind": "stocks",
+  "as_of": "2026-10-07T18:00:00-04:00",
+  "quotes": [
+    { "symbol": "AAPL", "price": 228.4, "change_pct": 0.8 },
+    { "symbol": "MSFT", "price": 415.2, "change_pct": -0.3 },
+    { "symbol": "NVDA", "price": 122.1, "change_pct": 1.4 }
+  ],
+  "sparkline": [100, 102, 101, 105, 108, 107, 110]
+}

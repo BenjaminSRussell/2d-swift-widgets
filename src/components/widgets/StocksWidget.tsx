@@ -3,13 +3,17 @@ import { GlassPane } from '../core/GlassPane';
 import { ArrowUpRight, TrendingUp, DollarSign } from 'lucide-react';
 import type { WidgetSize } from '../../types/widget';
 import clsx from 'clsx';
+import { useWidgetFeed } from '../../hooks/useWidgetFeed';
+import type { StocksPayload } from '../../types/widgetData';
 
 interface StocksWidgetProps {
     size?: WidgetSize;
 }
 
 export const StocksWidget = ({ size = 'small' }: StocksWidgetProps) => {
+    const { data: feed } = useWidgetFeed<StocksPayload>('stocks');
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    void feed; // sparkline/quotes available for future canvas bind
 
     // Dynamic dimensions based on size (could be more robust with ResizeObserver, but fixed checks work for this strict system)
     const isMedium = size === 'medium';

@@ -4,15 +4,18 @@ import { Play, SkipForward, SkipBack, Heart, ListMusic, Volume2 } from 'lucide-r
 import { motion } from 'framer-motion';
 import type { WidgetSize } from '../../types/widget';
 import clsx from 'clsx';
+import { useWidgetFeed } from '../../hooks/useWidgetFeed';
+import type { MusicPayload } from '../../types/widgetData';
 
 interface MusicPlayerWidgetProps {
     size?: WidgetSize;
 }
 
 export const MusicPlayerWidget = ({ size = 'small' }: MusicPlayerWidgetProps) => {
+    const { data: feed } = useWidgetFeed<MusicPayload>('music');
     const [isPlaying, setIsPlaying] = useState(true);
-    const [currentTime, setCurrentTime] = useState(36); // 36 seconds elapsed
-    const duration = 120; // 2 minutes total
+    const [currentTime, setCurrentTime] = useState(feed?.position_sec ?? 36);
+    const duration = feed?.duration_sec ?? 120;
     const progressPercentage = (currentTime / duration) * 100;
 
     // Simulate playback progression
