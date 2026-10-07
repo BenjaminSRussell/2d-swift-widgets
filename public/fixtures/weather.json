@@ -1,0 +1,10 @@
+{
+  "kind": "weather",
+  "location": "San Fran",
+  "temp_f": 72,
+  "condition": "Partly Cloudy",
+  "high_f": 78,
+  "low_f": 62,
+  "humidity_pct": 55,
+  "wind_mph": 8
+}
